@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getEventsRequest, getEventCategoriesRequest } from "../api/events";
 import EventCard from "../components/EventCard";
+import EventCardSkeleton from "../components/EventCardSkeleton";
 import EventFilters from "../components/EventFilters";
 import Pagination from "../components/Pagination";
 import EmptyState from "../components/EmptyState";
-import LoadingSpinner from "../components/LoadingSpinner";
+import Button from "../components/Button";
 import useDebounce from "../hooks/useDebounce";
 
 export default function Events() {
@@ -28,12 +29,15 @@ export default function Events() {
       .catch(() => setCategories([]));
   }, []);
 
-  // Reset to page 1 whenever filters change
+  // Reset to page 1 whenever filters change. This is a deliberate data-fetch
+  // synchronization pattern (not an accidental cascading render): page reset
+  // must happen in response to filter changes, before the fetch effect runs.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1);
   }, [debouncedSearch, category, sort]);
 
-  useEffect(() => {
+  const fetchEvents = useCallback(() => {
     setLoading(true);
     setError("");
 
@@ -47,6 +51,11 @@ export default function Events() {
       })
       .finally(() => setLoading(false));
   }, [debouncedSearch, category, sort, page]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- standard fetch-on-dependency-change pattern
+    fetchEvents();
+  }, [fetchEvents]);
 
   return (
     <div className="min-h-[calc(100vh-56px)] bg-gray-50 px-4 py-10">
@@ -67,14 +76,19 @@ export default function Events() {
         />
 
         {loading ? (
-          <LoadingSpinner label="Loading events..." />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <EventCardSkeleton key={i} />
+            ))}
+          </div>
         ) : error ? (
-          <EmptyState title="Something went wrong" message={error} />
-        ) : events.length === 0 ? (
           <EmptyState
-            title="No events found"
-            message="Try adjusting your search or filters."
+            title="Something went wrong"
+            message={error}
+            action={<Button onClick={fetchEvents}>Try again</Button>}
           />
+        ) : events.length === 0 ? (
+          <EmptyState title="No events found" message="Try adjusting your search or filters." />
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

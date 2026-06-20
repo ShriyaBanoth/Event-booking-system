@@ -1,3 +1,5 @@
+import Button from "./Button";
+
 export default function BookingModal({ event, seats, submitting, onConfirm, onClose }) {
   const total = (event.price || 0) * seats;
 
@@ -26,27 +28,17 @@ export default function BookingModal({ event, seats, submitting, onConfirm, onCl
           </div>
           <div className="flex justify-between text-base pt-1">
             <span className="text-gray-700 font-medium">Total</span>
-            <span className="text-gray-900 font-semibold">
-              {total > 0 ? `₹${total}` : "Free"}
-            </span>
+            <span className="text-gray-900 font-semibold">{total > 0 ? `₹${total}` : "Free"}</span>
           </div>
         </div>
 
         <div className="flex gap-2">
-          <button
-            onClick={onClose}
-            disabled={submitting}
-            className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg px-4 py-2 text-sm disabled:opacity-60"
-          >
+          <Button variant="secondary" onClick={onClose} disabled={submitting} className="flex-1">
             Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={submitting}
-            className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-medium rounded-lg px-4 py-2 text-sm"
-          >
-            {submitting ? "Confirming..." : "Confirm"}
-          </button>
+          </Button>
+          <Button onClick={onConfirm} loading={submitting} className="flex-1">
+            Confirm
+          </Button>
         </div>
       </div>
     </div>

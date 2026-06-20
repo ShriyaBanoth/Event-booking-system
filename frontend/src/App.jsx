@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Events from "./pages/Events";
 import EventDetails from "./pages/EventDetails";
 import MyBookings from "./pages/MyBookings";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -33,7 +34,7 @@ function App() {
                 <Route path="/bookings" element={<MyBookings />} />
               </Route>
 
-              <Route path="*" element={<Home />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
 

@@ -1,3 +1,5 @@
+import { SORT_OPTIONS } from "../utils/constants";
+
 export default function EventFilters({
   search,
   onSearchChange,
@@ -35,12 +37,11 @@ export default function EventFilters({
         onChange={(e) => onSortChange(e.target.value)}
         className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
       >
-        <option value="date_asc">Date: Soonest first</option>
-        <option value="date_desc">Date: Latest first</option>
-        <option value="name_asc">Name: A-Z</option>
-        <option value="name_desc">Name: Z-A</option>
-        <option value="price_asc">Price: Low to high</option>
-        <option value="price_desc">Price: High to low</option>
+        {SORT_OPTIONS.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
       </select>
     </div>
   );

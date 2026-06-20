@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
+import Button from "../components/Button";
 
 export default function Register() {
   const { register } = useAuth();
@@ -94,13 +95,9 @@ export default function Register() {
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium rounded-lg px-4 py-2 text-sm transition-colors"
-          >
-            {submitting ? "Creating account..." : "Sign up"}
-          </button>
+          <Button type="submit" loading={submitting} className="w-full">
+            Sign up
+          </Button>
         </form>
 
         <p className="text-sm text-gray-500 mt-6 text-center">

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
+import Button from "../components/Button";
 
 export default function Login() {
   const { login } = useAuth();
@@ -79,13 +80,9 @@ export default function Login() {
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium rounded-lg px-4 py-2 text-sm transition-colors"
-          >
-            {submitting ? "Logging in..." : "Log in"}
-          </button>
+          <Button type="submit" loading={submitting} className="w-full">
+            Log in
+          </Button>
         </form>
 
         <p className="text-sm text-gray-500 mt-6 text-center">

@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "seed": "node utils/seedEvents.js"
+    "seed": "node utils/seedEvents.js",
+    "format": "prettier --write \"**/*.js\" --ignore-path ../.prettierignore",
+    "format:check": "prettier --check \"**/*.js\" --ignore-path ../.prettierignore"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -23,6 +25,7 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.4"
+    "nodemon": "^3.1.4",
+    "prettier": "^3.3.3"
   }
 }

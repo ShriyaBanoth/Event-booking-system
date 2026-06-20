@@ -4,6 +4,8 @@ import toast from "react-hot-toast";
 import { getUserBookingsRequest, cancelBookingRequest } from "../api/bookings";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
+import Button from "../components/Button";
+import ConfirmDialog from "../components/ConfirmDialog";
 
 const formatDate = (dateString) =>
   new Date(dateString).toLocaleDateString("en-IN", {
@@ -16,6 +18,7 @@ export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState(null);
+  const [pendingCancel, setPendingCancel] = useState(null); // booking object awaiting confirmation
 
   const loadBookings = () => {
     setLoading(true);
@@ -26,10 +29,12 @@ export default function MyBookings() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- standard fetch-on-mount pattern
     loadBookings();
   }, []);
 
-  const handleCancel = async (bookingId) => {
+  const handleConfirmCancel = async () => {
+    const bookingId = pendingCancel._id;
     setCancellingId(bookingId);
     try {
       await cancelBookingRequest(bookingId);
@@ -37,6 +42,7 @@ export default function MyBookings() {
       setBookings((prev) =>
         prev.map((b) => (b._id === bookingId ? { ...b, status: "cancelled" } : b))
       );
+      setPendingCancel(null);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to cancel booking");
     } finally {
@@ -73,7 +79,7 @@ export default function MyBookings() {
               return (
                 <div
                   key={booking._id}
-                  className={`bg-white border rounded-xl p-4 flex items-center justify-between gap-4 ${
+                  className={`bg-white border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                     isCancelled ? "border-gray-200 opacity-60" : "border-gray-200"
                   }`}
                 >
@@ -91,9 +97,7 @@ export default function MyBookings() {
                     </div>
                     <span
                       className={`inline-block mt-1.5 text-xs font-medium px-2 py-0.5 rounded-full ${
-                        isCancelled
-                          ? "bg-gray-100 text-gray-500"
-                          : "bg-green-50 text-green-700"
+                        isCancelled ? "bg-gray-100 text-gray-500" : "bg-green-50 text-green-700"
                       }`}
                     >
                       {isCancelled ? "Cancelled" : "Confirmed"}
@@ -101,13 +105,13 @@ export default function MyBookings() {
                   </div>
 
                   {!isCancelled && (
-                    <button
-                      onClick={() => handleCancel(booking._id)}
-                      disabled={cancellingId === booking._id}
-                      className="text-sm text-red-600 hover:text-red-700 font-medium border border-red-200 hover:bg-red-50 rounded-lg px-3 py-1.5 disabled:opacity-60 shrink-0"
+                    <Button
+                      variant="danger"
+                      onClick={() => setPendingCancel(booking)}
+                      className="shrink-0 self-start sm:self-auto"
                     >
-                      {cancellingId === booking._id ? "Cancelling..." : "Cancel"}
-                    </button>
+                      Cancel
+                    </Button>
                   )}
                 </div>
               );
@@ -115,6 +119,18 @@ export default function MyBookings() {
           </div>
         )}
       </div>
+
+      {pendingCancel && (
+        <ConfirmDialog
+          title="Cancel this booking?"
+          message={`This will cancel your booking for "${pendingCancel.event?.name}" (${pendingCancel.seats} seat${pendingCancel.seats > 1 ? "s" : ""}) and release the seats back to other attendees. This can't be undone.`}
+          confirmLabel="Cancel booking"
+          variant="danger"
+          submitting={cancellingId === pendingCancel._id}
+          onConfirm={handleConfirmCancel}
+          onClose={() => setPendingCancel(null)}
+        />
+      )}
     </div>
   );
 }

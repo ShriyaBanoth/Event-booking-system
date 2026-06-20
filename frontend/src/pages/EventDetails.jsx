@@ -3,10 +3,12 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { getEventByIdRequest } from "../api/events";
 import { createBookingRequest } from "../api/bookings";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import BookingModal from "../components/BookingModal";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
+import Button from "../components/Button";
+import { MAX_BOOKABLE_SEATS } from "../utils/constants";
 
 const formatDate = (dateString) =>
   new Date(dateString).toLocaleDateString("en-IN", {
@@ -30,6 +32,7 @@ export default function EventDetails() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- standard fetch-on-mount pattern
     setLoading(true);
     getEventByIdRequest(id)
       .then((res) => setEvent(res.data.data.event))
@@ -80,7 +83,7 @@ export default function EventDetails() {
   }
 
   const isSoldOut = event.availableSeats <= 0;
-  const maxSeats = Math.min(event.availableSeats, 10);
+  const maxSeats = Math.min(event.availableSeats, MAX_BOOKABLE_SEATS);
 
   return (
     <div className="min-h-[calc(100vh-56px)] bg-gray-50 px-4 py-10">
@@ -112,9 +115,7 @@ export default function EventDetails() {
                   {event.price > 0 ? `₹${event.price}` : "Free"}
                 </div>
                 <div
-                  className={`text-sm font-medium ${
-                    isSoldOut ? "text-red-600" : "text-gray-500"
-                  }`}
+                  className={`text-sm font-medium ${isSoldOut ? "text-red-600" : "text-gray-500"}`}
                 >
                   {isSoldOut
                     ? "Sold out"
@@ -135,12 +136,7 @@ export default function EventDetails() {
                       </option>
                     ))}
                   </select>
-                  <button
-                    onClick={handleBookClick}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg px-5 py-2 text-sm"
-                  >
-                    Book Now
-                  </button>
+                  <Button onClick={handleBookClick}>Book Now</Button>
                 </div>
               )}
             </div>

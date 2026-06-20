@@ -7,7 +7,8 @@ export const notFound = (req, res, next) => {
 
 // Centralized error handler
 export const errorHandler = (err, req, res, next) => {
-  let statusCode = res.statusCode && res.statusCode !== 200 ? res.statusCode : 500;
+  let statusCode =
+    err.statusCode || (res.statusCode && res.statusCode !== 200 ? res.statusCode : 500);
   let message = err.message || "Internal Server Error";
 
   // Mongoose bad ObjectId
@@ -34,6 +35,7 @@ export const errorHandler = (err, req, res, next) => {
   res.status(statusCode).json({
     success: false,
     message,
+    requestId: req.id,
     stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
   });
 };
