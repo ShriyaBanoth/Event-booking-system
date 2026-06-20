@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Dashboard() {
@@ -11,9 +12,26 @@ export default function Dashboard() {
         </h1>
         <p className="text-gray-500 mb-6 text-sm">{user?.email}</p>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-6 text-sm text-gray-500">
-          This is a protected page — you can only see it while logged in. Event
-          listings and your bookings will appear here starting Phase 3.
+        <div className="grid sm:grid-cols-2 gap-4">
+          <Link
+            to="/events"
+            className="bg-white border border-gray-200 rounded-xl p-6 hover:border-indigo-300 hover:shadow-sm transition-all"
+          >
+            <h2 className="font-semibold text-gray-900 mb-1">Browse Events</h2>
+            <p className="text-sm text-gray-500">
+              Discover upcoming events and book your seats.
+            </p>
+          </Link>
+
+          <Link
+            to="/bookings"
+            className="bg-white border border-gray-200 rounded-xl p-6 hover:border-indigo-300 hover:shadow-sm transition-all"
+          >
+            <h2 className="font-semibold text-gray-900 mb-1">My Bookings</h2>
+            <p className="text-sm text-gray-500">
+              View, track, and cancel your event bookings.
+            </p>
+          </Link>
         </div>
       </div>
     </div>

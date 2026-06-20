@@ -20,8 +20,14 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-4 text-sm">
+          <Link to="/events" className="text-gray-600 hover:text-gray-900">
+            Events
+          </Link>
           {isAuthenticated ? (
             <>
+              <Link to="/bookings" className="text-gray-600 hover:text-gray-900">
+                My Bookings
+              </Link>
               <Link to="/dashboard" className="text-gray-600 hover:text-gray-900">
                 Dashboard
               </Link>

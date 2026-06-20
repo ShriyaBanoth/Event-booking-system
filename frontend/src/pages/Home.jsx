@@ -23,10 +23,10 @@ export default function Home() {
         ) : (
           <div className="flex items-center justify-center gap-3">
             <Link
-              to="/login"
+              to="/events"
               className="border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium rounded-lg px-5 py-2.5 text-sm"
             >
-              Log in
+              Browse Events
             </Link>
             <Link
               to="/register"
