@@ -16,4 +16,16 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// If the server says our token is invalid/expired, clear it so the UI
+// doesn't keep sending a dead token on every subsequent request.
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;

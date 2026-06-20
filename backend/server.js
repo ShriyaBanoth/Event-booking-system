@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+import authRoutes from "./routes/authRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -24,10 +25,10 @@ app.get("/api/health", (req, res) => {
   res.status(200).json({ success: true, message: "API is running" });
 });
 
-// Routes will be mounted here in later phases:
-// app.use("/api/auth", authRoutes);
-// app.use("/api/events", eventRoutes);
-// app.use("/api/bookings", bookingRoutes);
+// API routes
+app.use("/api/auth", authRoutes);
+// app.use("/api/events", eventRoutes);     // Added in Phase 3
+// app.use("/api/bookings", bookingRoutes); // Added in Phase 4
 
 // Error handling (must be last)
 app.use(notFound);
