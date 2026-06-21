@@ -6,6 +6,7 @@ import {
   cancelBookingRequest,
   getBookingQRRequest,
 } from "../api/bookings";
+import { getVenueBookingsRequest } from "../api/venueBookings";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import Button from "../components/Button";
@@ -20,19 +21,30 @@ const formatDate = (dateString) =>
 
 export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
+  const [venueBookings, setVenueBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState(null);
   const [pendingCancel, setPendingCancel] = useState(null); // booking object awaiting confirmation
   const [qrCode, setQrCode] = useState(null);
   const [showQR, setShowQR] = useState(false);
 
-  const loadBookings = () => {
-    setLoading(true);
-    getUserBookingsRequest()
-      .then((res) => setBookings(res.data.data.bookings))
-      .catch(() => toast.error("Couldn't load your bookings"))
-      .finally(() => setLoading(false));
-  };
+  const loadBookings = async () => {
+  setLoading(true);
+
+  try {
+    const [eventRes, venueRes] = await Promise.all([
+      getUserBookingsRequest(),
+      getVenueBookingsRequest(),
+    ]);
+
+    setBookings(eventRes.data.data.bookings);
+    setVenueBookings(venueRes.data.data);
+  } catch (error) {
+    toast.error("Couldn't load your bookings");
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- standard fetch-on-mount pattern
@@ -154,6 +166,30 @@ export default function MyBookings() {
           </div>
         )}
       </div>
+      {venueBookings.length > 0 && (
+        <div className="max-w-3xl mx-auto mt-8">
+          <h2 className="text-xl font-semibold mb-4">
+            My Venue Bookings
+          </h2>
+
+          <div className="space-y-3">
+            {venueBookings.map((booking) => (
+              <div
+                key={booking._id}
+                className="bg-white border rounded-xl p-4"
+              >
+                <h3 className="font-medium">
+                  {booking.venue?.name}
+                </h3>
+
+                <p>📍 {booking.venue?.city}</p>
+                <p>👥 Guests: {booking.guests}</p>
+                <p>🎉 {booking.eventType}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {showQR && (
   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
     <div className="bg-white rounded-xl p-6 max-w-sm w-full text-center">
