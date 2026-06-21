@@ -58,6 +58,18 @@ const eventSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    // Ratings summary maintained to avoid expensive aggregations on common list endpoints
+    averageRating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+    reviewCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   { timestamps: true }
 );

@@ -26,9 +26,13 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden sm:flex items-center gap-4 text-sm">
-          <Link to="/events" className={linkClass}>
-            Events
-          </Link>
+  <Link to="/events" className={linkClass}>
+    Events
+  </Link>
+
+  <Link to="/venues" className={linkClass}>
+    Venues
+  </Link>
           {isAuthenticated ? (
             <>
               <Link to="/bookings" className={linkClass}>

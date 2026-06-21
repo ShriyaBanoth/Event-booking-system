@@ -62,14 +62,17 @@ export const createBookingValidationRules = [
 const SORT_VALUES = ["date_asc", "date_desc", "name_asc", "name_desc", "price_asc", "price_desc"];
 
 export const listEventsValidationRules = [
-  query("search").optional().trim().isLength({ max: 100 }).withMessage("search term is too long"),
+  query("search")
+  .optional({ values: "falsy" })
+  .trim()
+  .isLength({ max: 100 })
+  .withMessage("search term is too long"),
   query("category")
-    .optional()
-    .trim()
-    .isIn(EVENT_CATEGORIES)
-    .withMessage(`category must be one of: ${EVENT_CATEGORIES.join(", ")}`),
-  query("sort")
-    .optional()
+  .optional({ values: "falsy" })
+  .trim()
+  .isIn(EVENT_CATEGORIES)
+  .withMessage(`category must be one of: ${EVENT_CATEGORIES.join(", ")}`),
+  query("sort").optional({ values: "falsy" })
     .isIn(SORT_VALUES)
     .withMessage(`sort must be one of: ${SORT_VALUES.join(", ")}`),
   query("page").optional().isInt({ min: 1 }).withMessage("page must be a positive integer"),

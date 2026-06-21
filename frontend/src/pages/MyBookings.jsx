@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
-import { getUserBookingsRequest, cancelBookingRequest } from "../api/bookings";
+import {
+  getUserBookingsRequest,
+  cancelBookingRequest,
+  getBookingQRRequest,
+} from "../api/bookings";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import Button from "../components/Button";
@@ -19,6 +23,8 @@ export default function MyBookings() {
   const [loading, setLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState(null);
   const [pendingCancel, setPendingCancel] = useState(null); // booking object awaiting confirmation
+  const [qrCode, setQrCode] = useState(null);
+  const [showQR, setShowQR] = useState(false);
 
   const loadBookings = () => {
     setLoading(true);
@@ -32,23 +38,43 @@ export default function MyBookings() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- standard fetch-on-mount pattern
     loadBookings();
   }, []);
-
   const handleConfirmCancel = async () => {
-    const bookingId = pendingCancel._id;
-    setCancellingId(bookingId);
-    try {
-      await cancelBookingRequest(bookingId);
-      toast.success("Booking cancelled");
-      setBookings((prev) =>
-        prev.map((b) => (b._id === bookingId ? { ...b, status: "cancelled" } : b))
-      );
-      setPendingCancel(null);
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to cancel booking");
-    } finally {
-      setCancellingId(null);
-    }
-  };
+  const bookingId = pendingCancel._id;
+  setCancellingId(bookingId);
+
+  try {
+    await cancelBookingRequest(bookingId);
+
+    toast.success("Booking cancelled");
+
+    setBookings((prev) =>
+      prev.map((b) =>
+        b._id === bookingId
+          ? { ...b, status: "cancelled" }
+          : b
+      )
+    );
+
+    setPendingCancel(null);
+  } catch (err) {
+    toast.error(
+      err.response?.data?.message ||
+      "Failed to cancel booking"
+    );
+  } finally {
+    setCancellingId(null);
+  }
+};
+  const handleViewQR = async (bookingId) => {
+  try {
+    const res = await getBookingQRRequest(bookingId);
+
+    setQrCode(res.data.data.qrCode);
+    setShowQR(true);
+  } catch (err) {
+    toast.error("Failed to load QR ticket");
+  }
+};
 
   return (
     <div className="min-h-[calc(100vh-56px)] bg-gray-50 px-4 py-10">
@@ -105,20 +131,51 @@ export default function MyBookings() {
                   </div>
 
                   {!isCancelled && (
-                    <Button
-                      variant="danger"
-                      onClick={() => setPendingCancel(booking)}
-                      className="shrink-0 self-start sm:self-auto"
-                    >
-                      Cancel
-                    </Button>
-                  )}
+  <div className="flex gap-2">
+    <Button
+      onClick={() => handleViewQR(booking._id)}
+      className="bg-blue-600 hover:bg-blue-700 text-white"
+    >
+      QR Ticket
+    </Button>
+
+    <Button
+      variant="danger"
+      onClick={() => setPendingCancel(booking)}
+      className="shrink-0 self-start sm:self-auto"
+    >
+      Cancel
+    </Button>
+  </div>
+)}
                 </div>
               );
             })}
           </div>
         )}
       </div>
+      {showQR && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-xl p-6 max-w-sm w-full text-center">
+      <h2 className="text-lg font-semibold mb-4">
+        Your Ticket QR Code
+      </h2>
+
+      <img
+        src={qrCode}
+        alt="QR Ticket"
+        className="mx-auto w-64 h-64"
+      />
+
+      <Button
+        className="mt-4"
+        onClick={() => setShowQR(false)}
+      >
+        Close
+      </Button>
+    </div>
+  </div>
+)}
 
       {pendingCancel && (
         <ConfirmDialog

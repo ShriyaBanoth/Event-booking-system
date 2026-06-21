@@ -27,6 +27,12 @@ export default function EventCard({ event }) {
         <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1 group-hover:text-indigo-600 transition-colors">
           {event.name}
         </h3>
+        {event.reviewCount > 0 && (
+          <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+            <span className="text-amber-500">★ {Number(event.averageRating).toFixed(1)}</span>
+            <span className="text-gray-400">· {event.reviewCount}</span>
+          </div>
+        )}
         <p className="text-sm text-gray-500 mb-3 line-clamp-2">{event.description}</p>
 
         <div className="flex items-center justify-between text-sm">
