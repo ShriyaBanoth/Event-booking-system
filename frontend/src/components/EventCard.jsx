@@ -1,4 +1,12 @@
 import { Link } from "react-router-dom";
+import musicImg from "../assets/images/music.jpg";
+import indieImg from "../assets/images/indie.jpeg";
+import marathonImg from "../assets/images/Marathon.jpeg";
+import streetImg from "../assets/images/street.jpeg";
+import startupImg from "../assets/images/Startup.jpeg";
+import shakespeareImg from "../assets/images/Shakespeare.jpeg";
+import sitarImg from "../assets/images/sitar&tabla.jpeg";
+import devconfImg from "../assets/images/DevConf.jpeg";
 
 const formatDate = (dateString) =>
   new Date(dateString).toLocaleDateString("en-IN", {
@@ -7,6 +15,15 @@ const formatDate = (dateString) =>
     month: "short",
     year: "numeric",
   });
+  const eventImages = {
+  "Indie Music Night": indieImg,
+  "Classical Sitar & Tabla Recital": sitarImg,
+  "City Marathon 10K": marathonImg,
+  "Street Food Carnival": streetImg,
+  "Startup Founders Summit": startupImg,
+  "DevConf 2026: Future of Web": devconfImg,
+  "Shakespeare in the Park: Hamlet": shakespeareImg,
+};
 
 export default function EventCard({ event }) {
   const isSoldOut = event.availableSeats <= 0;
@@ -17,11 +34,19 @@ export default function EventCard({ event }) {
       to={`/events/${event._id}`}
       className="group block bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md hover:border-gray-300 transition-all"
     >
-      <div className="h-36 bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-        <span className="text-white/90 text-sm font-medium px-3 py-1 bg-black/15 rounded-full">
-          {event.category}
-        </span>
-      </div>
+      <div className="relative h-48 overflow-hidden">
+  <img
+    src={eventImages[event.name] || musicImg}
+    alt={event.name}
+    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+  />
+
+  <div className="absolute top-3 left-3">
+    <span className="bg-black/70 text-white text-xs px-3 py-1 rounded-full">
+      {event.category}
+    </span>
+  </div>
+</div>
 
       <div className="p-4">
         <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1 group-hover:text-indigo-600 transition-colors">

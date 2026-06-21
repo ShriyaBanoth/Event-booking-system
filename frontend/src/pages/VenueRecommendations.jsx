@@ -1,5 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
+import { createVenueBookingRequest } from "../api/venueBookings";
 
 export default function VenueRecommendations() {
   const [city, setCity] = useState("Hyderabad");
@@ -25,6 +27,19 @@ export default function VenueRecommendations() {
       console.error(error);
     }
   };
+  const handleBookVenue = async (venue) => {
+  try {
+    await createVenueBookingRequest({
+      venueId: venue._id,
+      guests,
+      eventType: type,
+    });
+
+    toast.success("Venue booked successfully");
+  } catch (error) {
+    toast.error("Failed to book venue");
+  }
+};
 
   return (
     <div className="max-w-5xl mx-auto p-6">
@@ -88,9 +103,16 @@ export default function VenueRecommendations() {
             </h2>
 
             <p>📍 {venue.city}</p>
-            <p>👥 Capacity: {venue.capacity}</p>
-            <p>⭐ {venue.rating}</p>
-            <p>₹ {venue.pricePerDay.toLocaleString()}</p>
+<p>👥 Capacity: {venue.capacity}</p>
+<p>⭐ {venue.rating}</p>
+<p>₹ {venue.pricePerDay.toLocaleString()}</p>
+
+<button
+  onClick={() => handleBookVenue(venue)}
+  className="bg-green-600 text-white px-4 py-2 rounded mt-3"
+>
+  Book Venue
+</button>
           </div>
         ))}
       </div>
