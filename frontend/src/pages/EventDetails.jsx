@@ -11,6 +11,14 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import Button from "../components/Button";
 import { MAX_BOOKABLE_SEATS } from "../utils/constants";
+import musicImg from "../assets/images/music.jpg";
+import indieImg from "../assets/images/indie.jpeg";
+import marathonImg from "../assets/images/Marathon.jpeg";
+import streetImg from "../assets/images/street.jpeg";
+import startupImg from "../assets/images/Startup.jpeg";
+import shakespeareImg from "../assets/images/Shakespeare.jpeg";
+import sitarImg from "../assets/images/sitar&tabla.jpeg";
+import devconfImg from "../assets/images/DevConf.jpeg";
 
 const formatDate = (dateString) =>
   new Date(dateString).toLocaleDateString("en-IN", {
@@ -19,6 +27,15 @@ const formatDate = (dateString) =>
     month: "long",
     year: "numeric",
   });
+  const eventImages = {
+  "Indie Music Night": indieImg,
+  "Classical Sitar & Tabla Recital": sitarImg,
+  "City Marathon 10K": marathonImg,
+  "Street Food Carnival": streetImg,
+  "Startup Founders Summit": startupImg,
+  "DevConf 2026: Future of Web": devconfImg,
+  "Shakespeare in the Park: Hamlet": shakespeareImg,
+};
 
 export default function EventDetails() {
   const { id } = useParams();
@@ -122,13 +139,20 @@ export default function EventDetails() {
         <Link to="/events" className="text-sm text-gray-500 hover:text-gray-700">
           ← Back to events
         </Link>
-
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden mt-4">
-          <div className="h-48 bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-            <span className="text-white/90 text-sm font-medium px-3 py-1 bg-black/15 rounded-full">
-              {event.category}
-            </span>
-          </div>
+        <div className="relative h-72 overflow-hidden">
+  <img
+    src={eventImages[event.name] || musicImg}
+    alt={event.name}
+    className="w-full h-full object-cover"
+  />
+
+  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+    <span className="text-white text-lg font-semibold px-4 py-2 bg-black/50 rounded-full">
+      {event.category}
+    </span>
+  </div>
+</div>
 
           <div className="p-6">
             <h1 className="text-2xl font-semibold text-gray-900 mb-2">{event.name}</h1>
@@ -170,12 +194,6 @@ export default function EventDetails() {
 
   <Button onClick={handleBookClick}>Book Now</Button>
 
-  <Link
-    to="/venues"
-    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
-  >
-    🏛️ Find Venue
-  </Link>
 </div>
               )}
             </div>
