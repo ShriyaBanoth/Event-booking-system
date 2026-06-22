@@ -26,6 +26,9 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden sm:flex items-center gap-4 text-sm">
+          <Link to="/" className={linkClass}>
+  Home
+</Link>
   <Link to="/events" className={linkClass}>
     Events
   </Link>
@@ -33,6 +36,9 @@ export default function Navbar() {
   <Link to="/venues" className={linkClass}>
     Venues
   </Link>
+  <Link to="/about" className={linkClass}>
+  About Us
+</Link>
           {isAuthenticated ? (
             <>
               <Link to="/bookings" className={linkClass}>
@@ -96,6 +102,9 @@ export default function Navbar() {
       {/* Mobile dropdown menu */}
       {menuOpen && (
         <div className="sm:hidden absolute top-14 left-0 right-0 bg-white border-b border-gray-200 px-4 py-2 text-sm shadow-sm z-40">
+          <Link to="/" className={linkClass} onClick={() => setMenuOpen(false)}>
+  Home
+</Link>
           <Link to="/events" className={linkClass} onClick={() => setMenuOpen(false)}>
             Events
           </Link>
