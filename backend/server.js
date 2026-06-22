@@ -15,6 +15,7 @@ import eventRoutes from "./routes/eventRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import venueRoutes from "./routes/venueRoutes.js";
+import venueBookingRoutes from "./routes/venueBookingRoutes.js";
 
 dotenv.config();
 validateEnv();
@@ -91,6 +92,7 @@ app.use("/api/events", eventRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/venues", venueRoutes);
+app.use("/api/venue-bookings", venueBookingRoutes);
 
 // Error handling (must be last)
 app.use(notFound);
