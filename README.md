@@ -2,9 +2,24 @@
 
 A full-stack Event Booking System — React (Vite + Tailwind) frontend, Node.js/Express backend, MongoDB database.
 
-## Status: Phase 4 — Booking System ✅
+## Status: Final Submission Complete ✅
 
-Phases 1–4 are complete: project setup, JWT authentication, event browsing (search/filter/sort/pagination), and the full booking lifecycle (create, view, cancel — with atomic seat inventory management).
+A full-stack Event Booking System built using React, Node.js, Express.js, and MongoDB.
+
+Implemented features include:
+
+- User Authentication (Register, Login, Logout)
+- Event Listing & Event Details
+- Event Booking & Cancellation
+- Atomic Seat Inventory Management
+- Reviews & Ratings
+- QR Ticket Generation
+- Venue Recommendations
+- Venue Booking System
+- Event Images
+- Search, Filtering, Sorting & Pagination
+- Validation & Error Handling
+- Security Middleware (Helmet, Rate Limiting, Request Logging)
 
 ## Project Structure
 
@@ -78,6 +93,36 @@ event-booking-system/
 - **Backend:** Node.js, Express, Mongoose
 - **Database:** MongoDB (Atlas recommended)
 - **Auth (Phase 2):** JWT + bcrypt
+## Additional Features & Enhancements
+
+### Reviews & Ratings
+Users can submit ratings and reviews for events. Average ratings and review counts are displayed on event pages.
+
+### Venue Recommendations
+Venue recommendations are generated based on city, guest count, and event type.
+
+### Venue Booking System
+Users can directly book recommended venues through the platform.
+
+### QR Ticket Generation
+Each booking generates a QR-based ticket for event verification.
+
+### Event Images
+Events display category-specific images for a better user experience.
+
+### Security Features
+- JWT Authentication
+- Password Hashing (bcrypt)
+- Helmet Security Middleware
+- Rate Limiting
+- Centralized Error Handling
+- Request Tracking IDs
+
+### User Experience Improvements
+- Toast Notifications
+- Loading States
+- Empty States
+- Responsive Design
 
 ## Local Setup
 
@@ -234,13 +279,43 @@ If there aren't enough seats left, the request fails with `400` and a message st
 - **Booking ownership check**: `cancelBooking` verifies `booking.user` matches the authenticated user before allowing cancellation (`403` otherwise), so one user can't cancel another's booking even with a guessed booking ID.
 
 
-## Next Phases
+## Project Highlights
 
-| Phase | Scope |
-|---|---|
-| 5 | Production UX (Toasts, Loading/Empty States, Responsive Design) — partially in place already (toasts, loading/empty states, and responsive layout were built alongside Phases 3–4) |
-| 6 | Startup Enhancements (Categories, Pagination, Filters) — categories, pagination, and filters already implemented in Phase 3 |
-| 7 | Deployment (Render + Vercel) & Final README |
+### Authentication
+- Register
+- Login
+- Logout
+- Protected Routes
+
+### Event Management
+- Event Listing
+- Event Details
+- Search
+- Filtering
+- Sorting
+- Pagination
+
+### Booking Management
+- Seat Booking
+- Booking Cancellation
+- Seat Restoration
+- Booking History
+
+### Venue Management
+- Venue Recommendations
+- Venue Booking
+
+### Reviews & Feedback
+- Ratings
+- Reviews
+
+### Technical Features
+- REST APIs
+- MongoDB Integration
+- JWT Authentication
+- Validation & Error Handling
+- Atomic Seat Inventory Updates
+- Security Middleware
 
 ## Assumptions
 
