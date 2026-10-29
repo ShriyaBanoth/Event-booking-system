@@ -52,24 +52,28 @@ export const listUserBookings = async (userId) => {
 };
 
 export const cancelBooking = async ({ bookingId, userId }) => {
-  const booking = await Booking.findById(bookingId);
+  if (!mongoose.Types.ObjectId.isValid(bookingId)) {
+    throw new AppError("Invalid booking ID", 400);
+  }
+
+  // Atomic state transition: only ONE concurrent request can flip
+  // confirmed -> cancelled, so seats are released exactly once.
+  const booking = await Booking.findOneAndUpdate(
+    { _id: bookingId, user: userId, status: "confirmed" },
+    { status: "cancelled" },
+    { new: true }
+  );
 
   if (!booking) {
-    throw new AppError("Booking not found", 404);
-  }
-
-  if (booking.user.toString() !== userId.toString()) {
-    throw new AppError("Not authorized to cancel this booking", 403);
-  }
-
-  if (booking.status === "cancelled") {
+    const existing = await Booking.findById(bookingId);
+    if (!existing) throw new AppError("Booking not found", 404);
+    if (existing.user.toString() !== userId.toString()) {
+      throw new AppError("Not authorized to cancel this booking", 403);
+    }
     throw new AppError("Booking is already cancelled", 400);
   }
 
-  booking.status = "cancelled";
-  await booking.save();
-
-  // Release the seats back to the event's inventory
+  // Release seats only after we've won the status transition
   await Event.findByIdAndUpdate(booking.event, {
     $inc: { availableSeats: booking.seats },
   });
