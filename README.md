@@ -325,3 +325,36 @@ If there aren't enough seats left, the request fails with `400` and a message st
 - Logout is treated as a client-side action (token removal); no server-side token blacklist was implemented since it isn't required by the stated scope.
 - A maximum of 10 seats can be booked per transaction (UI-enforced) to keep the booking flow simple; this isn't a hard business rule, just a sane default.
 - Bookings are soft-cancelled (status flag) rather than deleted, to preserve a user's booking history.
+
+## Concurrency testing
+
+Seat booking and cancellation are designed to stay correct under simultaneous requests. I verified this with load scripts in `backend/loadtest/`.
+
+| Scenario | Before fix | After fix |
+|---|---|---|
+| 20 simultaneous cancels of one 5-seat booking | 16 succeeded; seats rose to 175 on a 100-seat event | 1 succeeded, 19 rejected; seats back to 100 |
+| 30 simultaneous 1-seat bookings on a 10-seat event | — | Exactly 10 succeeded, 0 seats left, never negative |
+
+**The cancel bug:** `cancelBooking` read the booking, checked its status, saved it, then returned the seats as separate steps. Concurrent requests could all pass the check before any saved, so the seats were released multiple times. The fix is a single atomic `findOneAndUpdate` filtered on `status: "confirmed"`, so only one request can win the transition. Seats are released only by that request.
+
+**Other safeguards:**
+- Booking is one conditional `findOneAndUpdate` on `availableSeats` and the event date, so overbooking and booking past events are rejected in the same atomic step.
+- If creating the booking fails after seats were reserved, the seats are returned.
+
+**Run it yourself** (backend running, database seeded):
+
+```bash
+cd backend
+node loadtest/verify-all.js
+```
+
+This creates temporary events, runs four checks (normal booking, booking race, past-event rejection, cancel race), and cleans up after itself.
+
+
+# Outputs iam getting from the terminal:
+1.shriya.banoth5607gmail.com@Shriyas-MacBook-Air backend % node loadtest/cancel-race.js
+Event "Stand-Up Night: Open Mic & Headliners": seats after booking = 95
+Cancel status codes: { '200': 16, '400': 4 }
+Seats after 20 simultaneous cancels = 175
+Expected = 100 (released once). Anything higher means the race bug is real.
+
