@@ -13,12 +13,14 @@ export const createBooking = async ({ userId, eventId, seats }) => {
     throw new AppError("Seats must be a whole number of at least 1", 400);
   }
 
-  // Atomic update: only succeeds if there are still enough available seats
-  // at the moment of the write. This prevents overbooking under concurrent
-  // requests without needing a multi-document transaction, since it's a
-  // single conditional update on one document.
+  // Atomic update: succeeds only if the event is still in the future AND
+  // enough seats remain at the moment of the write.
   const event = await Event.findOneAndUpdate(
-    { _id: eventId, availableSeats: { $gte: seatsRequested } },
+    {
+      _id: eventId,
+      availableSeats: { $gte: seatsRequested },
+      date: { $gt: new Date() },
+    },
     { $inc: { availableSeats: -seatsRequested } },
     { new: true }
   );
@@ -28,19 +30,31 @@ export const createBooking = async ({ userId, eventId, seats }) => {
     if (!existingEvent) {
       throw new AppError("Event not found", 404);
     }
+    if (existingEvent.date <= new Date()) {
+      throw new AppError("This event has already taken place", 400);
+    }
     throw new AppError(
       `Not enough seats available. Only ${existingEvent.availableSeats} seat(s) left.`,
       400
     );
   }
 
-  const booking = await Booking.create({
-    user: userId,
-    event: event._id,
-    seats: seatsRequested,
-    totalPrice: event.price * seatsRequested,
-    status: "confirmed",
-  });
+  let booking;
+  try {
+    booking = await Booking.create({
+      user: userId,
+      event: event._id,
+      seats: seatsRequested,
+      totalPrice: event.price * seatsRequested,
+      status: "confirmed",
+    });
+  } catch (err) {
+    // Compensating action: the seats were already taken, so give them back
+    await Event.findByIdAndUpdate(event._id, {
+      $inc: { availableSeats: seatsRequested },
+    });
+    throw err;
+  }
 
   return Booking.findById(booking._id).populate("event", "name date venue price");
 };
