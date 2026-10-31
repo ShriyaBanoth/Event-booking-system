@@ -9,7 +9,8 @@
     "dev": "nodemon server.js",
     "seed": "node utils/seedEvents.js",
     "format": "prettier --write \"**/*.js\" --ignore-path ../.prettierignore",
-    "format:check": "prettier --check \"**/*.js\" --ignore-path ../.prettierignore"
+    "format:check": "prettier --check \"**/*.js\" --ignore-path ../.prettierignore",
+    "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --runInBand"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -26,7 +27,16 @@
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
+    "cross-env": "^10.1.0",
+    "jest": "^30.5.2",
+    "mongodb-memory-server": "^11.3.0",
     "nodemon": "^3.1.4",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "supertest": "^7.3.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {},
+    "testTimeout": 60000
   }
 }
