@@ -10,7 +10,8 @@
     "seed": "node utils/seedEvents.js",
     "format": "prettier --write \"**/*.js\" --ignore-path ../.prettierignore",
     "format:check": "prettier --check \"**/*.js\" --ignore-path ../.prettierignore",
-    "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --runInBand"
+    "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
+    "seed:venues": "node utils/seedVenues.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
