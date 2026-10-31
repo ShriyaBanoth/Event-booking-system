@@ -350,11 +350,13 @@ node loadtest/verify-all.js
 
 This creates temporary events, runs four checks (normal booking, booking race, past-event rejection, cancel race), and cleans up after itself.
 
+## Running the tests
 
-# Outputs iam getting from the terminal:
-1.shriya.banoth5607gmail.com@Shriyas-MacBook-Air backend % node loadtest/cancel-race.js
-Event "Stand-Up Night: Open Mic & Headliners": seats after booking = 95
-Cancel status codes: { '200': 16, '400': 4 }
-Seats after 20 simultaneous cancels = 175
-Expected = 100 (released once). Anything higher means the race bug is real.
+```bash
+cd backend
+npm test
+```
 
+13 automated tests (Jest and Supertest) run against an in-memory MongoDB, never the real database. They cover registration and login, protected routes, booking rules (too few seats, past events), cancellation (seats restored, cancelling twice), and two concurrency cases: 30 simultaneous bookings on a 10-seat event allow exactly 10, and 20 simultaneous cancels of one booking allow exactly 1.
+
+GitHub Actions runs the suite on every push and pull request (`.github/workflows/ci.yml`).
