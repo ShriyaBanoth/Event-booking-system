@@ -1,4 +1,5 @@
 # Event Booking System
+![CI](https://github.com/ShriyaBanoth/Event-booking-system/actions/workflows/ci.yml/badge.svg)
 
 A full-stack Event Booking System — React (Vite + Tailwind) frontend, Node.js/Express backend, MongoDB database.
 
