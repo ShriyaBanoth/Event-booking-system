@@ -133,6 +133,20 @@ export const cancelBooking = async ({ bookingId, userId }) => {
     throw new AppError("Invalid booking ID", 400);
   }
 
+  // Cancellation closes when the event starts
+  const pending = await Booking.findOne({
+    _id: bookingId,
+    user: userId,
+    status: "confirmed",
+  }).populate("event", "date");
+
+  if (pending?.event && pending.event.date <= new Date()) {
+    throw new AppError(
+      "This event has already started, so the booking can no longer be cancelled",
+      400
+    );
+  }
+
   // Atomic state transition: only ONE concurrent request can flip
   // confirmed -> cancelled, so seats are released exactly once.
   const booking = await Booking.findOneAndUpdate(
