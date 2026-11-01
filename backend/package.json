@@ -39,5 +39,8 @@
     "testEnvironment": "node",
     "transform": {},
     "testTimeout": 60000
+  },
+  "engines": {
+    "node": "20.x"
   }
 }
