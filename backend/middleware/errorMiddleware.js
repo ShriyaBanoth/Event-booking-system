@@ -31,6 +31,13 @@ export const errorHandler = (err, req, res, next) => {
     const field = Object.keys(err.keyValue)[0];
     message = `${field} already exists`;
   }
+  // Log server-side failures; don't leak internals to clients in production
+  if (statusCode >= 500) {
+    console.error(err);
+    if (process.env.NODE_ENV === "production") {
+      message = "Internal Server Error";
+    }
+  }
 
   res.status(statusCode).json({
     success: false,
