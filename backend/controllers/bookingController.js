@@ -48,11 +48,10 @@ export const cancelBooking = asyncHandler(async (req, res) => {
 // @route   GET /api/bookings/:id/qr
 // @access  Private
 export const getBookingQRCode = asyncHandler(async (req, res) => {
-  const bookings = await bookingService.listUserBookings(req.user._id);
-
-  const booking = bookings.find(
-    (b) => b._id.toString() === req.params.id
-  );
+  const booking = await bookingService.getUserBooking({
+    bookingId: req.params.id,
+    userId: req.user._id,
+  });
 
   if (!booking) {
     res.status(404);

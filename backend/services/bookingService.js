@@ -174,3 +174,11 @@ export const cancelBooking = async ({ bookingId, userId }) => {
 
   return booking;
 };
+
+export const getUserBooking = async ({ bookingId, userId }) => {
+  if (!mongoose.Types.ObjectId.isValid(bookingId)) return null;
+  return Booking.findOne({ _id: bookingId, user: userId }).populate(
+    "event",
+    "name date venue price"
+  );
+};
