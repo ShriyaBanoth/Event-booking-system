@@ -15,6 +15,9 @@ import venueRoutes from "./routes/venueRoutes.js";
 import venueBookingRoutes from "./routes/venueBookingRoutes.js";
 
 const app = express();
+
+// Behind Render's proxy: trust exactly one hop so req.ip (and rate limiting) sees the real client
+app.set("trust proxy", 1);
 const isTest = process.env.NODE_ENV === "test";
 
 // Correlation ID - attached first so every later log line can reference it
