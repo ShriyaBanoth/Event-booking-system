@@ -1,42 +1,30 @@
-import VenueBooking from "../models/VenueBooking.js";
+import * as venueBookingService from "../services/venueBookingService.js";
+import asyncHandler from "../utils/asyncHandler.js";
 
-export const createVenueBooking = async (req, res) => {
-  try {
-    const { venueId, guests, eventType } = req.body;
+export const createVenueBooking = asyncHandler(async (req, res) => {
+  const { venueId, guests, eventType, eventDate, slot } = req.body;
 
-    const booking = await VenueBooking.create({
-      user: req.user._id,
-      venue: venueId,
-      guests,
-      eventType,
-    });
+  const booking = await venueBookingService.createVenueBooking({
+    userId: req.user._id,
+    venueId,
+    guests,
+    eventType,
+    eventDate,
+    slot,
+  });
 
-    res.status(201).json({
-      success: true,
-      data: booking,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+  res.status(201).json({ success: true, message: "Venue booking confirmed", data: booking });
+});
 
-export const getMyVenueBookings = async (req, res) => {
-  try {
-    const bookings = await VenueBooking.find({
-      user: req.user._id,
-    }).populate("venue");
+export const getMyVenueBookings = asyncHandler(async (req, res) => {
+  const bookings = await venueBookingService.listMyVenueBookings(req.user._id);
+  res.json({ success: true, data: bookings });
+});
 
-    res.json({
-      success: true,
-      data: bookings,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+export const cancelVenueBooking = asyncHandler(async (req, res) => {
+  const booking = await venueBookingService.cancelVenueBooking({
+    bookingId: req.params.id,
+    userId: req.user._id,
+  });
+  res.json({ success: true, message: "Venue booking cancelled", data: booking });
+});

@@ -5,3 +5,6 @@ export const createVenueBookingRequest = (data) =>
 
 export const getVenueBookingsRequest = () =>
   api.get("/venue-bookings");
+
+export const cancelVenueBookingRequest = (id) =>
+  api.delete(`/venue-bookings/${id}`);

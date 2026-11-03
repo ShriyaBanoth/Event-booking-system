@@ -1,45 +1,28 @@
 import venueBg from "../assets/images/Venue.png";
 import { useState } from "react";
-import axios from "axios";
 import toast from "react-hot-toast";
-import { createVenueBookingRequest } from "../api/venueBookings";
+import { getVenueRecommendationsRequest } from "../api/venues";
+import VenueBookingModal from "../components/VenueBookingModal";
 
 export default function VenueRecommendations() {
   const [city, setCity] = useState("Hyderabad");
   const [type, setType] = useState("Wedding");
   const [guests, setGuests] = useState(500);
   const [venues, setVenues] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
+  const [selectedVenue, setSelectedVenue] = useState(null);
 
   const searchVenues = async () => {
+    setLoading(true);
     try {
-      const res = await axios.get(
-        "http://localhost:5000/api/venues/recommendations",
-        {
-          params: {
-            city,
-            guests,
-            type,
-          },
-        }
-      );
-
+      const res = await getVenueRecommendationsRequest({ city, guests, type });
       setVenues(res.data.data);
+      setSearched(true);
     } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleBookVenue = async (venue) => {
-    try {
-      await createVenueBookingRequest({
-        venueId: venue._id,
-        guests,
-        eventType: type,
-      });
-
-      toast.success("Venue booked successfully");
-    } catch (error) {
-      toast.error("Failed to book venue");
+      toast.error(error.response?.data?.message || "Couldn't load venues");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,10 +41,10 @@ export default function VenueRecommendations() {
 
           <div className="grid grid-cols-3 gap-4 mb-6">
             <select
-  className="border p-2 rounded bg-white text-black"
-  value={city}
-  onChange={(e) => setCity(e.target.value)}
->
+              className="border p-2 rounded bg-white text-black"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+            >
               <option>Hyderabad</option>
               <option>Mumbai</option>
               <option>Bangalore</option>
@@ -70,29 +53,38 @@ export default function VenueRecommendations() {
             </select>
 
             <select
-  className="border p-2 rounded bg-white text-black"
-  value={type}
-  onChange={(e) => setType(e.target.value)}
->
+              className="border p-2 rounded bg-white text-black"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+            >
               <option>Wedding</option>
               <option>Birthday</option>
               <option>Corporate</option>
             </select>
 
             <input
-  type="number"
-  className="border p-2 rounded bg-white text-black"
+              type="number"
+              min={1}
+              className="border p-2 rounded bg-white text-black"
               value={guests}
               onChange={(e) => setGuests(e.target.value)}
+              aria-label="Minimum capacity needed"
             />
           </div>
 
           <button
             onClick={searchVenues}
-            className="bg-indigo-600 text-white px-4 py-2 rounded"
+            disabled={loading}
+            className="bg-indigo-600 text-white px-4 py-2 rounded disabled:opacity-60"
           >
-            Find Venues
+            {loading ? "Searching..." : "Find Venues"}
           </button>
+
+          {searched && !loading && venues.length === 0 && (
+            <p className="mt-8 text-white">
+              No venues match that city, event type and capacity. Try fewer guests or another city.
+            </p>
+          )}
 
           <div className="grid md:grid-cols-2 gap-6 mt-8">
             {venues.map((venue) => (
@@ -108,9 +100,7 @@ export default function VenueRecommendations() {
                   />
                 )}
 
-                <h2 className="text-xl font-semibold">
-                  {venue.name}
-                </h2>
+                <h2 className="text-xl font-semibold">{venue.name}</h2>
 
                 <p>📍 {venue.city}</p>
                 <p>👥 Capacity: {venue.capacity}</p>
@@ -118,7 +108,7 @@ export default function VenueRecommendations() {
                 <p>₹ {venue.pricePerDay.toLocaleString()}</p>
 
                 <button
-                  onClick={() => handleBookVenue(venue)}
+                  onClick={() => setSelectedVenue(venue)}
                   className="bg-green-600 text-white px-4 py-2 rounded mt-3"
                 >
                   Book Venue
@@ -128,6 +118,15 @@ export default function VenueRecommendations() {
           </div>
         </div>
       </div>
+
+      {selectedVenue && (
+        <VenueBookingModal
+          venue={selectedVenue}
+          eventType={type}
+          initialGuests={guests}
+          onClose={() => setSelectedVenue(null)}
+        />
+      )}
     </div>
   );
 }

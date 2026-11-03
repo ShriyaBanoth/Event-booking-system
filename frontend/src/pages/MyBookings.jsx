@@ -6,7 +6,7 @@ import {
   cancelBookingRequest,
   getBookingQRRequest,
 } from "../api/bookings";
-import { getVenueBookingsRequest } from "../api/venueBookings";
+import { getVenueBookingsRequest, cancelVenueBookingRequest } from "../api/venueBookings";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import Button from "../components/Button";
@@ -27,6 +27,17 @@ export default function MyBookings() {
   const [pendingCancel, setPendingCancel] = useState(null); // booking object awaiting confirmation
   const [qrCode, setQrCode] = useState(null);
   const [showQR, setShowQR] = useState(false);
+
+  const handleCancelVenueBooking = async (booking) => {
+    if (!window.confirm(`Cancel your booking of ${booking.venue?.name}?`)) return;
+    try {
+      await cancelVenueBookingRequest(booking._id);
+      toast.success("Venue booking cancelled");
+      await loadBookings();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Couldn't cancel the booking");
+    }
+  };
 
   const loadBookings = async () => {
   setLoading(true);
@@ -185,6 +196,31 @@ export default function MyBookings() {
                 <p>📍 {booking.venue?.city}</p>
                 <p>👥 Guests: {booking.guests}</p>
                 <p>🎉 {booking.eventType}</p>
+                {booking.eventDate && (
+                  <p>
+                    📅{" "}
+                    {new Date(booking.eventDate).toLocaleDateString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      timeZone: "UTC",
+                    })}
+                    {booking.slot
+                      ? ` · ${booking.slot.charAt(0).toUpperCase() + booking.slot.slice(1)}`
+                      : ""}
+                  </p>
+                )}
+                <p className={booking.status === "cancelled" ? "text-red-600" : "text-green-700"}>
+                  Status: {booking.status === "cancelled" ? "Cancelled" : "Confirmed"}
+                </p>
+                {booking.status !== "cancelled" && (
+                  <button
+                    onClick={() => handleCancelVenueBooking(booking)}
+                    className="mt-2 text-sm text-red-600 underline"
+                  >
+                    Cancel booking
+                  </button>
+                )}
               </div>
             ))}
           </div>
