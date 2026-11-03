@@ -55,8 +55,8 @@ export const createBookingValidationRules = [
   body("seats")
     .notEmpty()
     .withMessage("seats is required")
-    .isInt({ min: 1, max: 10 })
-    .withMessage("seats must be a whole number between 1 and 10"),
+    .isInt({ min: 1 })
+    .withMessage("seats must be a whole number of at least 1"),
 ];
 
 const SORT_VALUES = ["date_asc", "date_desc", "name_asc", "name_desc", "price_asc", "price_desc"];

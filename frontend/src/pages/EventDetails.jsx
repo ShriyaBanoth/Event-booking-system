@@ -10,7 +10,6 @@ import BookingModal from "../components/BookingModal";
 import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import Button from "../components/Button";
-import { MAX_BOOKABLE_SEATS } from "../utils/constants";
 import musicImg from "../assets/images/music.jpg";
 import indieImg from "../assets/images/indie.jpeg";
 import marathonImg from "../assets/images/Marathon.jpeg";
@@ -47,6 +46,7 @@ export default function EventDetails() {
   const [notFound, setNotFound] = useState(false);
 
   const [seats, setSeats] = useState(1);
+  const [seatsText, setSeatsText] = useState("1");
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [reviews, setReviews] = useState([]);
@@ -131,7 +131,9 @@ export default function EventDetails() {
   }
 
   const isSoldOut = event.availableSeats <= 0;
-  const maxSeats = Math.min(event.availableSeats, MAX_BOOKABLE_SEATS);
+  const maxSeats = event.availableSeats;
+  const seatsUnavailable = seats > maxSeats;
+  const seatsInvalid = seats < 1;
 
   return (
     <div className="min-h-[calc(100vh-56px)] bg-gray-50 px-4 py-10">
@@ -180,19 +182,34 @@ export default function EventDetails() {
 
               {!isSoldOut && (
                 <div className="flex items-center gap-3">
-  <select
-    value={seats}
-    onChange={(e) => setSeats(Number(e.target.value))}
-    className="rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white"
-  >
-    {Array.from({ length: maxSeats }, (_, i) => i + 1).map((n) => (
-      <option key={n} value={n}>
-        {n} seat{n > 1 ? "s" : ""}
-      </option>
-    ))}
-  </select>
+  <div className="flex flex-col">
+    <input
+      type="number"
+      min={1}
+      value={seatsText}
+      onFocus={(e) => e.target.select()}
+      onChange={(e) => {
+        const raw = e.target.value.replace(/\D/g, "");
+        setSeatsText(raw);
+        setSeats(raw === "" ? 0 : parseInt(raw, 10));
+      }}
+      onBlur={() => {
+        if (seats < 1) {
+          setSeats(1);
+          setSeatsText("1");
+        }
+      }}
+      aria-label="Number of seats"
+      className="w-24 rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white"
+    />
+    {seatsUnavailable && (
+      <p className="mt-1 text-xs text-red-600">
+        {seats} seats aren't available. Only {maxSeats} seat{maxSeats > 1 ? "s" : ""} available.
+      </p>
+    )}
+  </div>
 
-  <Button onClick={handleBookClick}>Book Now</Button>
+  <Button onClick={handleBookClick} disabled={seatsUnavailable || seatsInvalid}>Book Now</Button>
 
 </div>
               )}

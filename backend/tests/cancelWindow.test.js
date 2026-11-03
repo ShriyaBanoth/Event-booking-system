@@ -3,7 +3,6 @@ import {
   registerUser, makeEvent, book, cancel, seatsLeft,
 } from "./helpers.js";
 import Event from "../models/Event.js";
-import SeatQuota from "../models/SeatQuota.js";
 
 beforeAll(startDb);
 afterAll(stopDb);
@@ -25,8 +24,6 @@ describe("cancellation window", () => {
     const res = await cancel(token, b.body.data.booking._id);
     expect(res.status).toBe(400);
     expect(await seatsLeft(event._id)).toBe(97);
-    const quota = await SeatQuota.findOne({ event: event._id });
-    expect(quota.seats).toBe(3);
   });
 
   test("cancelling before the event starts still works", async () => {

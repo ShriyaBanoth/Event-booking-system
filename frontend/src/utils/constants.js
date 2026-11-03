@@ -21,5 +21,3 @@ export const SORT_OPTIONS = [
   { value: "price_asc", label: "Price: Low to high" },
   { value: "price_desc", label: "Price: High to low" },
 ];
-
-export const MAX_BOOKABLE_SEATS = 10;
